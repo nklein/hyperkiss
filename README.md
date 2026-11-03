@@ -31,5 +31,13 @@ two, forty three, or even forty four.
 This program attempts to graphically display arrangements in any number
 of dimensions utilizing multiple three-dimensional viewports.
 
+Currently, it is a bunch of utilities and then some scratch work
+in `hyperkiss.lisp` where most of the real action happens at the moment.
+
+Here is a screenshot of a 5-dimensional lattice packing that demonstrates
+the current best known lower-bound on the kissing number in five dimesions.
+
+![screenshot of application for showing hypersphere kissing arrangements](images/hyperkiss.jpg)
+
 
 [wikipedia]: https://en.wikipedia.org/wiki/Kissing_number

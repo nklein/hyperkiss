@@ -25,6 +25,10 @@
   (check-type elts vec)
   (copy-seq elts))
 
+(defun vdims (v)
+  (check-type v vec)
+  (length v))
+
 (defun v. (a b)
   (reduce #'+ (mapcar #'* a b)))
 
@@ -275,7 +279,6 @@
          (axises (kiss-window-axises win))
          (u (* (- x (/ (glut:width win) 2)) scale 1.0))
          (v (* (- (/ (glut:height win) 2) y) scale 1.0)))
-    (format *debug-io* "~A,~A~%" u v)
     (values (v+ (v+ (vs u (elt *rotation* (elt axises 0)))
                     (vs v (elt *rotation* (elt axises 1))))
                 (vs 10 (elt *rotation* (elt axises 2))))
@@ -445,11 +448,11 @@
     (push s *spheres*)))
 
 (defmethod add-reflected ((win kiss-window) hit selected)
-  (let* ((reflected (reflect hit (list* (apply #'vec (loop :repeat (kiss-window-dimensions win)
-                                                           :collecting 0))
-                                        (remove hit selected))))
-         (validp (when reflected
-                   (< (abs (- (v. reflected reflected) 4)) +tolerance+))))
+  (let* ((reflected (vn (reflect hit (list* (apply #'vec (loop :repeat (kiss-window-dimensions win)
+                                                               :collecting 0))
+                                            (remove hit selected)))
+                        2))
+         (validp t))
     (cond
       ((and reflected
             validp
@@ -461,9 +464,6 @@
       ((and reflected
             validp)
        (format *debug-io* "THAT WOULD OVERLAP EXISTING SPHERES~%")
-       nil)
-      (reflected
-       (format *debug-io* "THAT ISN'T THE RIGHT LENGTH^2: ~A~%" (v. reflected reflected))
        nil)
       (t
        (format *debug-io* "NOT A VALID REFLECTION~%")
@@ -589,11 +589,12 @@
 #+(or)
 (trivial-main-thread:with-body-in-main-thread (:blocking nil)
   #+sbcl (sb-int:set-floating-point-modes :traps nil)
-  (setf *spheres* (list (vec 2 0 0 0 0)
-                        (vec 1 (sqrt 3) 0 0 0)
-                        (vec 1 (/ (sqrt 3) 3) (* 2/3 (sqrt 6)) 0 0)
-                        (vec 1 (/ (sqrt 3) 3) (* 1/6 (sqrt 6)) (* 1/2 (sqrt 10)) 0)
-                        (vec 1 (/ (sqrt 3) 3) (* 1/6 (sqrt 6)) (* 1/10 (sqrt 10)) (* 2/5 (sqrt 15)))))
+  (setf *spheres* (or (ignore-errors cl-user::*s*)
+                      (list (vec 2 0 0 0 0)
+                            (vec 1 (sqrt 3) 0 0 0)
+                            (vec 1 (/ (sqrt 3) 3) (* 2/3 (sqrt 6)) 0 0)
+                            (vec 1 (/ (sqrt 3) 3) (* 1/6 (sqrt 6)) (* 1/2 (sqrt 10)) 0)
+                            (vec 1 (/ (sqrt 3) 3) (* 1/6 (sqrt 6)) (* 1/10 (sqrt 10)) (* 2/5 (sqrt 15))))))
 
   (setf *selected* nil)
   (setf *overlap-wins* nil)
